@@ -80,7 +80,15 @@
             }
             if (value != nil) {
                 _isLocked = true;
-                [[UIDevice currentDevice] setValue:value forKey:@"orientation"];
+                if (@available(iOS 16.0, *)) {
+                    #if __IPHONE_OS_VERSION_MAX_ALLOWED > __IPHONE_15_5
+                        SEL supportedInterfaceSelector = NSSelectorFromString(@"setNeedsUpdateOfSupportedInterfaceOrientations");
+                        [self.viewController performSelector:supportedInterfaceSelector];
+                    #endif
+                } else {
+                    [[UIDevice currentDevice] setValue:value forKey:@"orientation"];
+                    [UINavigationController attemptRotationToDeviceOrientation];
+                }
             } else {
                 _isLocked = false;
             }
